@@ -1,0 +1,38 @@
+--- 
+#Provision web server role
+- name: "Install packages"
+  yum: name={{ item }} state=latest update_cache=yes
+  with_items:
+    - httpd
+    - php
+    - php-pdo
+    - php-pdo_mysql
+
+#    - libapache2-mod-php
+#    - libapache2-mod-auth-mysql
+#    - php5-mysql
+#    - phpmyadmin
+
+- name: Start Apache
+  service: name=httpd state=restarted
+
+- name: Delete Old Application
+  file: 
+    path: /var/www/html/pdo-master
+    state: absent
+
+- name: Create application folder in apache
+  file:
+    path: /var/www/html/pdo-master
+    state: directory
+
+- name: Copy latest application code
+  copy: src=/var/tmp/dev/ dest=/var/www/html/pdo-master/
+
+
+- name: Start Apache
+  service: name=httpd state=restarted
+
+- name: apache network configuration
+  shell: setsebool -P httpd_can_network_connect=1
+

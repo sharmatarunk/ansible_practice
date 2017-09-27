@@ -1,0 +1,18 @@
+--- 
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  user: tarun
+  pre_tasks:
+    - include_vars: vars/server_vars.yml
+  roles:
+    - bootstrap-web-server-role
+
+#- hosts: tag_Name_tarun_webserver
+#  user: ec2-user
+#  become: true
+#  pre_tasks:
+#    - include_vars: vars/server_vars.yml
+#  roles:
+#   - provision-web-server-role
+

@@ -1,0 +1,12 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  user: tarun
+  pre_tasks:
+    - include_vars: vars/server_vars.yml
+  roles:
+    - bootstrap-db-server-role
+#    - provision-db-server-role
+
+

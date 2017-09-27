@@ -1,0 +1,27 @@
+--- 
+#Provision db server role
+- name: "Install updates"
+  yum: name=* state=latest
+- name: "Install others"
+  yum: name={{ item }} state=latest update_cache=yes
+  with_items:
+    - mariadb-server
+    - MySQL-python
+
+- name: Start Mariadb
+  service: name=mariadb state=started enabled=true
+
+- name: Create a new database
+  mysql_db: name=test state=present 
+
+- name: Create a database user
+  mysql_user: 
+    name: "monty1" 
+    host: "%"
+    #host_all: yes
+    password: "monty1" 
+    priv: "*.*:ALL,GRANT" 
+    state: present
+- name: create a table
+  raw: mysql -e "CREATE TABLE test.users (id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY, firstname VARCHAR(30) NOT NULL, lastname VARCHAR(30) NOT NULL,email VARCHAR(50) NOT NULL,age INT(3),location VARCHAR(50),date TIMESTAMP);"    
+

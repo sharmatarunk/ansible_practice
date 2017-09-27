@@ -1,0 +1,34 @@
+--- 
+- name: "Bootstrap db Server Role"
+  local_action: 
+    module: ec2
+    count: "{{ db_count }}"
+    group: "{{ security_group }}"
+#    id: "{{ webserver_tag_name }}"
+    image: "{{ image }}"
+    instance_tags: 
+      Name: "{{ db_tag_name }}"
+      Type: "{{ db_tag_type }}"
+    instance_type: "{{ instance_type }}"
+    keypair: "{{ keypair }}"
+    region: "{{ region }}"
+    wait: true
+  register: ec2
+
+- debug: var=item
+  with_items: ec2.instances
+
+- name: add ec2 instance to hosts
+  add_host: 
+    ec2_ip_address: "{{ item.public_ip }}"
+    ec2_region: "{{ region }}"
+    ec2_tag_Name: "{{ db_tag_name }}"
+    groups: "{{ db_tag_type }}"
+    name: "{{ item.public_ip }}"
+  with_items: "{{ec2.instances}}"
+
+- name: "Wait for the instances to boot by checking the ssh port"
+  wait_for: "host={{ item.public_ip }} port=22 delay=5 timeout=320 state=started"
+  with_items: "{{ec2.instances}}"
+
+
